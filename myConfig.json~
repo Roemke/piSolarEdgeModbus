@@ -1,0 +1,11 @@
+{
+    "_comment" : "ein paar Einstellungen fuer meine Instanz", 
+    "influxToken": "5O7JtsK3joqkHJGNZ0Jeb3LWwjnb5Wwvvl4y2ZebRrh-BDqJPNWSZlUYhUM7WnsYw7m3HZAz9jFq2klKEj_o8A==",
+    "influxUrl" : "localhost:8086",
+    "influxOrg" : "Home",
+    "influxBucket" : "solaredge",
+    "intervalRead" : 10,
+    "intervalWrite": 10,
+    "modbusHost" : "192.168.0.205",
+    "modbusPort" : 1502
+}

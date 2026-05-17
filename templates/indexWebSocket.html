@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar-Daten mit WebSocket</title>
+    <style>
+        table { border-collapse: collapse; width: 50%; margin: 20px auto; }
+        th, td { border: 1px solid black; padding: 10px; text-align: center; }
+    </style>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+
+</head>
+<body>
+    <h1 style="text-align:center;">Aktuelle Solar-Daten (WebSocket) <span id="iDate"></span></h1>
+    <table>
+        <tr>
+            <th>Messung</th>
+            <th>Wert</th>
+        </tr>
+        <tr>
+            <td>power_dc (Solar)</td>
+            <td id="power_dc">Lade...</td>
+        </tr>
+        <tr>
+            <td>power_ac (Inverter) </td>
+            <td id="power_ac">Lade...</td>
+        </tr>
+        <tr>
+            <td>power (Meter)</td>
+            <td id="power">Lade...</td>
+        </tr>
+        <tr>
+            <td>Battery Power</td>
+            <td id="power_bat">Lade...</td>
+        </tr>
+        <tr>
+            <td>Battery soe</td>
+            <td id="soe">Lade...</td>
+        </tr>
+    </table>
+    <script>
+        // Verbindung zum WebSocket-Server herstellen
+        //const socket = new WebSocket(`ws://${location.host}/socket.io/?EIO=3&transport=websocket`);
+        //console.log(`Connecting to WebSocket at ws://${location.host}`);
+        //const socket = new WebSocket(`ws://${location.host}`);
+        
+        //const socket = io.connect(`ws://${location.host}`);
+        document.addEventListener("DOMContentLoaded", () => {
+            const socket = io();
+            
+            socket.on('connect', () => {
+                console.log("WebSocket connection established.");
+            });
+            
+
+            // Wenn neue Daten vom Server kommen        
+            socket.on('test_event', (data) => {
+                console.log('Test event received:', data);
+            });
+            socket.on('update_data', (data) => {
+                console.log("received data");
+                try {
+                    // Daten als JSON parsen
+                    const data = JSON.parse(event.data);
+                    document.getElementById("iDate").innerHTML = new Date();
+                    // HTML-Elemente aktualisieren
+                    document.getElementById("power_dc").textContent = `${data.power_dc.toFixed(1)} W`;
+                    document.getElementById("power_ac").textContent = `${data.power_ac.toFixed(1)} W`;
+                    document.getElementById("power").textContent =`${data.power.toFixed(1)} W`;
+                    document.getElementById("power_bat").textContent = `${data.power_bat.toFixed(1)} W`;
+                    document.getElementById("soe").textContent = `${data.soe.toFixed(0)} %`;
+                } catch (error) {
+                    console.error("Fehler beim Verarbeiten der WebSocket-Nachricht:", error);
+                }
+            });
+            //onclose an sich unnoetig
+            socket.on('disconnect', () => {
+                console.log("WebSocket connection closed.");
+            });
+            // Fehlerbehandlung für WebSocket
+            socket.onerror = (error) => {
+                console.error("WebSocket-Fehler:", error);
+            };
+        });
+    </script>
+</body>
+</html>

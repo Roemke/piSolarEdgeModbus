@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+#mit flask jabe ich mal begonnen, bin aber schon eine Zeit raus, daher evtl. mal 
+#etwas anderes anschauen. Tornado scheint speziell fuer websockets zu sein, fastapi
+#hat einige gute kritiken bekommen.
+
+#app muss allerdings mit uvicorn gestartet werden, dieser ist der Webserver
+
+import json 
+import argparse
+import uvicorn # der Webserver 
+
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+
+
+app = FastAPI()
+
+templates = Jinja2Templates(directory="templates")
+@app.get("/", response_class=HTMLResponse)
+async def read_item(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request, "title": "My FastAPI Page"})
+    
+if __name__ == "__main__":
+    # read some configuration
+    with open("myConfig.json", "r") as file:
+        config = json.load(file)
+    
+    argparser = argparse.ArgumentParser()
+    argparser.add_argument("--host", type=str, default=config["modbusHost"], help="Modbus TCP address")
+    argparser.add_argument("--port", type=int, default=config["modbusPort"], help="Modbus TCP port")
+    argparser.add_argument("--timeout", type=int, default=1, help="Connection timeout")
+    argparser.add_argument("--unit", type=int, default=1, help="Modbus device address")
+    argparser.add_argument("--interval_read", type=int, default=config["intervalRead"], help="Update interval read")
+    argparser.add_argument("--interval_write", type=int, default=config["intervalWrite"], help="Update interval write to influx")
+    argparser.add_argument("--influx_url", type=str, default=config["influxUrl"], help="InfluxDB URL")
+    argparser.add_argument("--influx_org", type=str, help=config["influxOrg"])
+    argparser.add_argument("--influx_bucket", type=str, default=config["influxBucket"], help="InfluxDB bucket")
+    argparser.add_argument("--influx_token", type=str, default=config["influxToken"],help="InfluxDB token")
+    args = argparser.parse_args()
+
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8090)
+    

@@ -1,0 +1,19 @@
+urspruengliches Projekt dürfte von https://pypi.org/project/solaredge-modbus/
+sein? https://github.com/nmakel/solaredge_modbus
+
+hatte ich mal angefangen, aber nicht dokumentiert und ich habe keine Ahnung
+mehr, was genau ich vor hatte. Ich glaube ich wollte mal in der influxdb
+speichern, aber eigentlich brauche ich die Daten ja nicht. 
+
+Für die Steuerung meiner Batterie / einspeisung sollte ich aber die Daten,
+die ich vom Inverter abfrage zur Verfügung stellen. 
+
+Kopiere mal influx2WebServ.py, ich glaube dass sollte die Daten mal
+als Webservice darstellen, ich reduziere es, auf eine Anfrage, 
+die die Werte als json liefert. 
+
+Neue Datei (reduziert) ist solar.py
+
+dort auch einen anderen webserver, waitress, da Flask wohl nicht zwingend
+stabil ist, sagt doku und warning 
+pip install waitress nötig
