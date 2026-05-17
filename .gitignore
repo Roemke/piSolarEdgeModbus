@@ -1,5 +1,5 @@
 release.sh
-
+*~
 #personal config for influx
 myConfig.json
 
@@ -107,3 +107,11 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+build/
+dist/
+*.egg-info/
+*.py~
+*.txt~
+*.html~
+
+myConfig.json

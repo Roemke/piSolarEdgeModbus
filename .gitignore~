@@ -1,7 +1,7 @@
 release.sh
 
-#personal token for influx
-token
+#personal config for influx
+myConfig.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -107,3 +107,11 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+build/
+dist/
+*.egg-info/
+*.py~
+*.txt~
+*.html~
+
+myConfig.json
