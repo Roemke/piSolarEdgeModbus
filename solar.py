@@ -125,12 +125,31 @@ def read_data():
 
                     json_body.append(battery_data)
                 
+
+                solar_in  = json_body[0]["fields"]["power_dc"]
                 
-                data["power_ac"] = json_body[0]["fields"]["power_ac"]
-                data["power_dc"] = json_body[0]["fields"]["power_dc"]
-                data["power"] = json_body[1]["fields"]["power"]
-                data["power_bat"] = json_body[2]["fields"]["instantaneous_power"]
-                data["soe"] = json_body[2]["fields"]["soe"]
+                ac_out    = json_body[0]["fields"]["power_ac"]
+                grid      = json_body[1]["fields"]["power"]
+                bat_power = json_body[2]["fields"]["instantaneous_power"]
+                soe       = json_body[2]["fields"]["soe"]
+
+                grid_export     = max(0,  grid)
+                grid_import     = max(0, -grid)
+                bat_charging    = max(0,  bat_power)
+                bat_discharging = max(0, -bat_power)
+                house           = ac_out - grid                
+                inverter_losses = solar_in + bat_discharging - ac_out
+
+                data["solar_in"]        = round(solar_in,        1)
+                data["ac_out"]          = round(ac_out,          1)
+                data["inverter_losses"] = round(inverter_losses, 1)
+                data["grid_export"]     = round(grid_export,     1)
+                data["grid_import"]     = round(grid_import,     1)
+                data["bat_power"]       = round(bat_power,       1)
+                data["bat_charging"]    = round(bat_charging,    1)
+                data["bat_discharging"] = round(bat_discharging, 1)
+                data["bat_soe"]         = round(soe,             1)
+                data["house"]           = round(house,           1)
                 #print("Daten:", data)
                 
                 #schreibe in datei
@@ -196,7 +215,7 @@ if __name__ == "__main__":
     argparser = argparse.ArgumentParser()
     argparser.add_argument("--host", type=str, default=config["modbusHost"], help="Modbus TCP address")
     argparser.add_argument("--port", type=int, default=config["modbusPort"], help="Modbus TCP port")
-    argparser.add_argument("--timeout", type=int, default=1, help="Connection timeout")
+    argparser.add_argument("--timeout", type=int, default=5, help="Connection timeout")
     argparser.add_argument("--unit", type=int, default=1, help="Modbus device address")
     argparser.add_argument("--interval_read", type=int, default=config["intervalRead"], help="Update interval read")
     argparser.add_argument("--interval_write", type=int, default=config["intervalWrite"], help="Update interval write to influx")
@@ -214,13 +233,19 @@ if __name__ == "__main__":
         unit=args.unit
     )
     
-    json_body= {"measurement": "not set"}
-    data = {}
-    data["power_ac"] = 0
-    data["power_dc"] = 0
-    data["power"] = 0
-    data["power_bat"] = 0
-    data["soe"] = 0
+    json_body= []
+    data = {
+        "solar_in":        0,
+        "ac_out":          0,
+        "inverter_losses": 0,
+        "grid_export":     0,
+        "grid_import":     0,
+        "bat_power":       0,
+        "bat_charging":    0,
+        "bat_discharging": 0,
+        "bat_soe":         0,
+        "house":           0,
+    }
 
 
 
