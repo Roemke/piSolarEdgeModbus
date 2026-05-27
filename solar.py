@@ -126,9 +126,9 @@ def read_data():
                     json_body.append(battery_data)
                 
 
-                solar_in  = json_body[0]["fields"]["power_dc"]
+                power_dc  = json_body[0]["fields"]["power_dc"]
                 
-                ac_out    = json_body[0]["fields"]["power_ac"]
+                power_ac    = json_body[0]["fields"]["power_ac"]
                 grid      = json_body[1]["fields"]["power"]
                 bat_power = json_body[2]["fields"]["instantaneous_power"]
                 soe       = json_body[2]["fields"]["soe"]
@@ -137,12 +137,13 @@ def read_data():
                 grid_import     = max(0, -grid)
                 bat_charging    = max(0,  bat_power)
                 bat_discharging = max(0, -bat_power)
-                house           = ac_out - grid                
-                inverter_losses = solar_in + bat_discharging - ac_out
+                house           = power_ac - grid                
+                inverter_losses = power_dc + bat_discharging - power_ac
 
-                data["solar_in"]        = round(solar_in,        1)
-                data["ac_out"]          = round(ac_out,          1)
+                data["power_dc"]        = round(power_dc,        1)
+                data["power_ac"]        = round(power_ac,        1)
                 data["inverter_losses"] = round(inverter_losses, 1)
+                data["grid"]            = round(grid,           1)
                 data["grid_export"]     = round(grid_export,     1)
                 data["grid_import"]     = round(grid_import,     1)
                 data["bat_power"]       = round(bat_power,       1)
@@ -235,9 +236,10 @@ if __name__ == "__main__":
     
     json_body= []
     data = {
-        "solar_in":        0,
-        "ac_out":          0,
+        "power_dc":        0,
+        "power_ac":          0,
         "inverter_losses": 0,
+        "grid":            0,
         "grid_export":     0,
         "grid_import":     0,
         "bat_power":       0,
