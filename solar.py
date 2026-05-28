@@ -25,7 +25,7 @@ dataLock = Lock()
         
 ###########################################################################################################
 def read_data():
-    global data, json_body, inverter, args, dataLock
+    global data, json_body, inverter, args, dataLock, write_counter
     
     while True:
         with dataLock:
@@ -137,20 +137,27 @@ def read_data():
                 grid_import     = max(0, -grid)
                 bat_charging    = max(0,  bat_power)
                 bat_discharging = max(0, -bat_power)
-                house           = power_ac - grid                
-                inverter_losses = power_dc + bat_discharging - power_ac
+                inverter_losses = power_dc - bat_power - power_ac
 
-                data["power_dc"]        = round(power_dc,        1)
-                data["power_ac"]        = round(power_ac,        1)
-                data["inverter_losses"] = round(inverter_losses, 1)
-                data["grid"]            = round(grid,           1)
-                data["grid_export"]     = round(grid_export,     1)
-                data["grid_import"]     = round(grid_import,     1)
-                data["bat_power"]       = round(bat_power,       1)
-                data["bat_charging"]    = round(bat_charging,    1)
-                data["bat_discharging"] = round(bat_discharging, 1)
-                data["bat_soe"]         = round(soe,             1)
-                data["house"]           = round(house,           1)
+                # nach den anderen data[] Zuweisungen:
+                data["time"] = current_time
+                data["power_dc"]        = round(power_dc,        1) #nur solar in
+                data["power_ac"]        = round(power_ac,        1) # ausgabe Wechselrichter von Batterie + Solar
+                data["inverter_losses"] = round(inverter_losses, 1) # Verluste im Wechselrichter, also DC→AC Differenz
+                data["grid"]            = round(grid,           1) #  Netzübergabepunkt. Positiv = ins Netz, negativ = aus 
+                                                                    #dem Netz. Hier fließen auch die zwei unabhängigen Panels mit ein
+                data["grid_export"]     = round(grid_export,     1) # Einspeisung ins Netz, positiv
+                data["grid_import"]     = round(grid_import,     1) # Bezug aus Netz, positiv
+                data["bat_power"]       = round(bat_power,       1) # Batterie Leistung, positiv = laden, negativ = entladen
+                data["bat_charging"]    = round(bat_charging,    1) # Batterie lädt, positiv
+                data["bat_discharging"] = round(bat_discharging, 1) # Batterie entlädt, positiv
+                data["bat_soe"]         = round(soe,             1) # State of Energy (Ladestand) der Batterie in Prozent
+                
+                write_counter += 1
+                if write_counter >= 3:
+                    write_counter = 0
+                    with open("/misc/solarlog.txt", "a") as file:
+                        file.write(current_time + ": " + str(data) + "\n")
                 #print("Daten:", data)
                 
                 #schreibe in datei
@@ -235,7 +242,9 @@ if __name__ == "__main__":
     )
     
     json_body= []
+    write_counter=0
     data = {
+        "time":		"",
         "power_dc":        0,
         "power_ac":          0,
         "inverter_losses": 0,
@@ -246,7 +255,6 @@ if __name__ == "__main__":
         "bat_charging":    0,
         "bat_discharging": 0,
         "bat_soe":         0,
-        "house":           0,
     }
 
 
