@@ -137,13 +137,13 @@ def read_data():
                 grid_import     = max(0, -grid)
                 bat_charging    = max(0,  bat_power)
                 bat_discharging = max(0, -bat_power)
-                inverter_losses = power_dc - bat_power - power_ac
+                #inverter_losses = power_dc - power_ac leider falsch
 
                 # nach den anderen data[] Zuweisungen:
                 data["time"] = current_time
-                data["power_dc"]        = round(power_dc,        1) #nur solar in
+                data["power_dc"]        = round(power_dc,        1) #nur solar in - wohl doch nicht
                 data["power_ac"]        = round(power_ac,        1) # ausgabe Wechselrichter von Batterie + Solar
-                data["inverter_losses"] = round(inverter_losses, 1) # Verluste im Wechselrichter, also DC→AC Differenz
+                #data["inverter_losses"] = round(inverter_losses, 1) # Verluste im Wechselrichter, also DC→AC Differenz
                 data["grid"]            = round(grid,           1) #  Netzübergabepunkt. Positiv = ins Netz, negativ = aus 
                                                                     #dem Netz. Hier fließen auch die zwei unabhängigen Panels mit ein
                 data["grid_export"]     = round(grid_export,     1) # Einspeisung ins Netz, positiv
@@ -153,11 +153,11 @@ def read_data():
                 data["bat_discharging"] = round(bat_discharging, 1) # Batterie entlädt, positiv
                 data["bat_soe"]         = round(soe,             1) # State of Energy (Ladestand) der Batterie in Prozent
                 
-                write_counter += 1
-                if write_counter >= 3:
-                    write_counter = 0
-                    with open("/misc/solarlog.txt", "a") as file:
-                        file.write(current_time + ": " + str(data) + "\n")
+                #write_counter += 1
+                #if write_counter >= 3:
+                #    write_counter = 0
+                #    with open("/misc/solarlog.txt", "a") as file:
+                #        file.write(current_time + ": " + str(data) + "\n")
                 #print("Daten:", data)
                 
                 #schreibe in datei
@@ -247,7 +247,7 @@ if __name__ == "__main__":
         "time":		"",
         "power_dc":        0,
         "power_ac":          0,
-        "inverter_losses": 0,
+        #"inverter_losses": 0,
         "grid":            0,
         "grid_export":     0,
         "grid_import":     0,
